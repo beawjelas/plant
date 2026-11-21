@@ -241,7 +241,7 @@ $('dl').addEventListener('click',async()=>{
     // Catatan + kode waktu pembuatan (tanggal & jam perangkat, format ddmmyyyy-jjmmdd), di luar kartu
     const n=new Date(),z=v=>String(v).padStart(2,'0');
     const kode=z(n.getDate())+z(n.getMonth()+1)+n.getFullYear()+'-'+z(n.getHours())+z(n.getMinutes())+z(n.getSeconds());
-    const note='Cek kembali NIK, nama, posisi, dan foto sebelum diproses. Cetak dengan ukuran asli (100%) di kertas A4, lalu potong sesuai tanda potong.';
+    const note='Cek kembali NIK, nama, posisi, dan foto sebelum diproses. Cetak menggunakan kertas A4, lalu potong sesuai tanda potong.';
     pdf.setFontSize(7);pdf.setTextColor(130);
     pdf.text(pdf.splitTextToSize(note,150),105,279,{align:'center'});
     pdf.text(kode,105,287,{align:'center'});
