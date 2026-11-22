@@ -94,8 +94,7 @@ footer{margin:36px 0 0;padding-top:16px;border-top:1px solid var(--line);text-al
       <div><label for="nounit">No. Unit</label><select id="nounit" disabled><option value="">Pilih Model Unit dulu</option></select></div>
       <div><label for="hm">HM Unit</label><input id="hm" type="text" inputmode="decimal" placeholder="Hour meter" autocomplete="off"></div>
       <div><label for="comp">Component</label><input id="comp" type="text" placeholder="Contoh: Engine, Final Drive" autocomplete="off"></div>
-      <div class="full"><label for="rating">Rating</label><input id="rating" type="text" list="rl" placeholder="Pilih atau ketik rating" autocomplete="off">
-        <datalist id="rl"><option value="NORMAL"><option value="WASPADA"><option value="ABNORMAL"><option value="KRITIS"></datalist></div>
+      <div class="full"><label for="rating">Rating</label><select id="rating"><option value="">Pilih Rating</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="X">X</option></select></div>
       <div class="full"><label for="rem">Remarks <span class="opt">(opsional)</span></label><textarea id="rem" placeholder="Catatan hasil pengamatan magnetic plug"></textarea></div>
       <div class="full"><label for="foto">Foto Magnetic Plug</label><input id="foto" type="file" accept="image/*"></div>
     </div>
