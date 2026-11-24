@@ -46,6 +46,9 @@ input[type=file]{width:100%;font-size:14px;color:var(--sub)}
 .btn{margin-top:18px;width:100%;background:#218838;color:#fff;border:none;padding:14px 24px;font-size:14px;font-weight:bold;border-radius:6px;cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,.1)}
 @media(prefers-color-scheme:dark){.btn{background:#23863e;box-shadow:0 2px 6px rgba(0,0,0,.5)}}
 .btn:active{filter:brightness(.9)}
+.rstrow{display:flex;justify-content:flex-end;margin:-4px 0 10px}
+.rst{display:inline-block;margin:0;background:transparent;color:var(--sub);border:1px solid var(--line);border-radius:8px;padding:6px 16px;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer}
+.rst:active{background:var(--bg)}
 .btn:disabled{opacity:.7;cursor:wait}
 .hint{font-size:12px;color:var(--sub);margin:10px 0 0;text-align:center}
 .prev{margin-top:22px}
@@ -97,6 +100,7 @@ footer{margin:36px 0 0;padding-top:16px;border-top:1px solid var(--line);text-al
   </div>
   <p class="sub">Monitoring Magnetic Plug. Pilih Model Unit dulu, lalu No. Unit, isi data, upload foto, dan buat foto CBM.</p>
   <div class="panel">
+    <div class="rstrow"><button class="rst" id="rst" type="button">&#8635; Reset Form</button></div>
     <div class="grid">
       <div><label for="model">Model Unit</label><select id="model"><option value="">Pilih Model Unit</option></select></div>
       <div><label for="nounit">No. Unit</label><select id="nounit" disabled><option value="">Pilih Model Unit dulu</option></select></div>
@@ -223,10 +227,10 @@ $('foto').addEventListener('change',e=>{
     const im=new Image();
     im.onerror=bad;
     im.onload=()=>{
-      const M=1600,k=Math.min(1,M/Math.max(im.naturalWidth,im.naturalHeight));
+      const M=1000,k=Math.min(1,M/Math.max(im.naturalWidth,im.naturalHeight));
       const c=document.createElement('canvas');c.width=Math.round(im.naturalWidth*k);c.height=Math.round(im.naturalHeight*k);
       const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);
-      $('photo').style.backgroundImage='url('+c.toDataURL('image/jpeg',.92)+')';
+      $('photo').style.backgroundImage='url('+c.toDataURL('image/jpeg',.85)+')';
     };
     im.src=r.result;
   };
@@ -237,6 +241,16 @@ $('foto').addEventListener('change',e=>{
 const resetShare=()=>{const b=$('dl');if(b.onclick){b.onclick=null;b.disabled=false;b.textContent='BUAT FOTO CBM';}};
 document.querySelector('.panel').addEventListener('input',resetShare);
 document.querySelector('.panel').addEventListener('change',resetShare);
+
+$('rst').addEventListener('click',()=>{
+  if(!confirm('Kosongkan semua isian form?'))return;
+  ['hm','comp','rating','rem'].forEach(id=>{$(id).value='';$(id).dispatchEvent(new Event('input',{bubbles:true}));});
+  $('model').value='';$('model').dispatchEvent(new Event('change',{bubbles:true}));
+  $('foto').value='';$('photo').style.backgroundImage='';
+  ['model','nounit','hm','comp','rating','rem','foto'].forEach(id=>$(id).classList.remove('err'));
+  resetShare();
+  window.scrollTo({top:0,behavior:'smooth'});
+});
 
 $('dl').addEventListener('click',async()=>{
   if($('dl').onclick)return;
@@ -259,18 +273,22 @@ $('dl').addEventListener('click',async()=>{
     clone.style.cssText='position:fixed;left:-99999px;top:0;transform:none';
     clone.querySelector('.stamp').style.display='block';
     document.body.appendChild(clone);
-    // A4 dibagi 4 = A6 landscape (148 x 105 mm) pada 300 dpi = 1748 x 1240 px
-    const OW=1748,OH=1240;
+    // A6 landscape (148 x 105 mm) pada 240 dpi = 1400 x 993 px (lebih ringan)
+    const OW=1400,OH=993;
     const cv=await html2canvas(clone,{scale:OH/CH,backgroundColor:'#ffffff',useCORS:true,logging:false});
     clone.remove();clone=null;
     const out=document.createElement('canvas');out.width=OW;out.height=OH;
     const ox=out.getContext('2d');ox.fillStyle='#fff';ox.fillRect(0,0,OW,OH);
     ox.drawImage(cv,0,0,OW,OH);
-    const raw=await new Promise(r=>out.toBlob(r,'image/jpeg',.95));
+    let raw=null;
+    for(let q=.9;q>=.62;q-=.04){
+      raw=await new Promise(r=>out.toBlob(r,'image/jpeg',q));
+      if(!raw||raw.size<=200*1024)break;
+    }
     if(!raw)throw new Error('Gagal membuat gambar');
-    // Simpan info 300 dpi di file JPG agar tercetak tepat A6
+    // Simpan info 240 dpi di file JPG agar tercetak tepat A6
     const buf=new Uint8Array(await raw.arrayBuffer());
-    if(buf[2]===0xFF&&buf[3]===0xE0){buf[13]=1;buf[14]=1;buf[15]=0x2C;buf[16]=1;buf[17]=0x2C;}
+    if(buf[2]===0xFF&&buf[3]===0xE0){buf[13]=1;buf[14]=0;buf[15]=0xF0;buf[16]=0;buf[17]=0xF0;}
     const blob=new Blob([buf],{type:'image/jpeg'});
     const cl=v=>v.trim().toUpperCase().replace(/[^A-Z0-9]+/g,'_').replace(/^_+|_+$/g,'');
     const n=new Date(),z=v=>String(v).padStart(2,'0');
