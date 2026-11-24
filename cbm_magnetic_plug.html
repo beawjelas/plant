@@ -46,7 +46,7 @@ input[type=file]{width:100%;font-size:14px;color:var(--sub)}
 .btn{margin-top:18px;width:100%;background:#218838;color:#fff;border:none;padding:14px 24px;font-size:14px;font-weight:bold;border-radius:6px;cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,.1)}
 @media(prefers-color-scheme:dark){.btn{background:#23863e;box-shadow:0 2px 6px rgba(0,0,0,.5)}}
 .btn:active{filter:brightness(.9)}
-.rstrow{display:flex;justify-content:flex-end;margin:-4px 0 10px}
+.rstrow{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px;margin:-4px 0 10px}
 .rst{display:inline-block;margin:0;background:transparent;color:var(--sub);border:1px solid var(--line);border-radius:8px;padding:6px 16px;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer}
 .rst:active{background:var(--bg)}
 .btn:disabled{opacity:.7;cursor:wait}
@@ -100,7 +100,7 @@ footer{margin:36px 0 0;padding-top:16px;border-top:1px solid var(--line);text-al
   </div>
   <p class="sub">Monitoring Magnetic Plug. Pilih Model Unit dulu, lalu No. Unit, isi data, upload foto, dan buat foto CBM.</p>
   <div class="panel">
-    <div class="rstrow"><button class="rst" id="rst" type="button">&#8635; Reset Form</button></div>
+    <div class="rstrow"><button class="rst" id="rstAll" type="button">&#8635; Reset Form (All)</button><button class="rst" id="rst" type="button">&#8635; Reset Form (Component, Rating, Photo)</button></div>
     <div class="grid">
       <div><label for="model">Model Unit</label><select id="model"><option value="">Pilih Model Unit</option></select></div>
       <div><label for="nounit">No. Unit</label><select id="nounit" disabled><option value="">Pilih Model Unit dulu</option></select></div>
@@ -242,14 +242,22 @@ const resetShare=()=>{const b=$('dl');if(b.onclick){b.onclick=null;b.disabled=fa
 document.querySelector('.panel').addEventListener('input',resetShare);
 document.querySelector('.panel').addEventListener('change',resetShare);
 
-$('rst').addEventListener('click',()=>{
-  if(!confirm('Kosongkan semua isian form?'))return;
+$('rstAll').addEventListener('click',()=>{
+  if(!confirm('Clear all form fields?'))return;
   ['hm','comp','rating','rem'].forEach(id=>{$(id).value='';$(id).dispatchEvent(new Event('input',{bubbles:true}));});
   $('model').value='';$('model').dispatchEvent(new Event('change',{bubbles:true}));
   $('foto').value='';$('photo').style.backgroundImage='';
   ['model','nounit','hm','comp','rating','rem','foto'].forEach(id=>$(id).classList.remove('err'));
   resetShare();
   window.scrollTo({top:0,behavior:'smooth'});
+});
+
+$('rst').addEventListener('click',()=>{
+  if(!confirm('Clear Component, Rating, and Photo? (Model, Unit No., HM, Remarks are kept)'))return;
+  ['comp','rating'].forEach(id=>{$(id).value='';$(id).dispatchEvent(new Event('input',{bubbles:true}));});
+  $('foto').value='';$('photo').style.backgroundImage='';
+  ['comp','rating','foto'].forEach(id=>$(id).classList.remove('err'));
+  resetShare();
 });
 
 $('dl').addEventListener('click',async()=>{
