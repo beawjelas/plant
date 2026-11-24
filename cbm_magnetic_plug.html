@@ -46,9 +46,10 @@ input[type=file]{width:100%;font-size:14px;color:var(--sub)}
 .btn{margin-top:18px;width:100%;background:#218838;color:#fff;border:none;padding:14px 24px;font-size:14px;font-weight:bold;border-radius:6px;cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,.1)}
 @media(prefers-color-scheme:dark){.btn{background:#23863e;box-shadow:0 2px 6px rgba(0,0,0,.5)}}
 .btn:active{filter:brightness(.9)}
-.rstrow{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px;margin:-4px 0 10px}
 .rst{display:inline-block;margin:0;background:transparent;color:var(--sub);border:1px solid var(--line);border-radius:8px;padding:6px 16px;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer}
 .rst:active{background:var(--bg)}
+.rstrow{position:sticky;top:calc(env(safe-area-inset-top,0px) + var(--sh,0px));z-index:19;background:var(--bg);display:flex;justify-content:center;flex-wrap:wrap;gap:8px;padding:6px 0;margin:-6px 0 12px}
+.rstrow .rst{background:var(--card);padding:5px 10px;font-size:11px;white-space:nowrap}
 .btn:disabled{opacity:.7;cursor:wait}
 .hint{font-size:12px;color:var(--sub);margin:10px 0 0;text-align:center}
 .prev{margin-top:22px}
@@ -99,8 +100,11 @@ footer{margin:36px 0 0;padding-top:16px;border-top:1px solid var(--line);text-al
   <div class="divider" aria-hidden="true"></div>
   </div>
   <p class="sub">Monitoring Magnetic Plug. Pilih Model Unit dulu, lalu No. Unit, isi data, upload foto, dan buat foto CBM.</p>
+  <div class="rstrow">
+    <button class="rst" id="rstAll" type="button">&#8635; Reset Form (All)</button>
+    <button class="rst" id="rst" type="button">&#8635; Reset Form (Component, Rating, Photo)</button>
+  </div>
   <div class="panel">
-    <div class="rstrow"><button class="rst" id="rstAll" type="button">&#8635; Reset Form (All)</button><button class="rst" id="rst" type="button">&#8635; Reset Form (Component, Rating, Photo)</button></div>
     <div class="grid">
       <div><label for="model">Model Unit</label><select id="model"><option value="">Pilih Model Unit</option></select></div>
       <div><label for="nounit">No. Unit</label><select id="nounit" disabled><option value="">Pilih Model Unit dulu</option></select></div>
@@ -166,6 +170,11 @@ $('rem').addEventListener('input',()=>{$('remc').textContent=$('rem').value.leng
 // Time stamp tanggal & jam: hanya muncul di foto hasil (tidak di pratinjau)
 const z2=v=>String(v).padStart(2,'0');
 function setStamp(d){$('stamp').textContent=z2(d.getDate())+'/'+z2(d.getMonth()+1)+'/'+d.getFullYear()+'  '+z2(d.getHours())+':'+z2(d.getMinutes());}
+
+// Tombol reset menempel tepat di bawah header saat scroll
+const stk=document.querySelector('.stick');
+const setSh=()=>document.documentElement.style.setProperty('--sh',stk.offsetHeight+'px');
+new ResizeObserver(setSh).observe(stk);setSh();
 
 // Skala pratinjau mengikuti lebar layar
 const CW=1185,CH=848;
